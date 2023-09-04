@@ -1,5 +1,5 @@
 ﻿using Domain.Model;
-using System.ComponentModel.Design;
+using Application;
 
 internal class Program
 {
@@ -9,32 +9,36 @@ internal class Program
         Console.WriteLine("Seja bem vindo ao banco Framework");
         Console.WriteLine("Por favor, identifique-se");
         Console.WriteLine("");
-        var pessoa = Identificacao();
+        var cliente = Identificacao();
     }
 
     static Pessoa Identificacao()
     {
-        var pessoa = new Pessoa();
+        var cliente = new Cliente();
 
         Console.WriteLine("Seu número de identificação:");
-        pessoa.Id = int.Parse(Console.ReadLine());
+        cliente.Id = int.Parse(Console.ReadLine());
 
         Console.WriteLine("Seu nome:");
-        pessoa.Nome = Console.ReadLine();
+        cliente.Nome = Console.ReadLine();
 
         Console.WriteLine("Seu CPF:");
-        pessoa.Cpf = Console.ReadLine();
+        cliente.Cpf = Console.ReadLine();
+        
+        Console.WriteLine("Seu saldo:");
+        cliente.Saldo = float.Parse(Console.ReadLine());
+
         Console.Clear();
 
-        MenuOpcoes(pessoa);
+        MenuOpcoes(cliente);
         
         Console.ReadKey();
         
-        return pessoa;
+        return cliente;
     }
-    private static void MenuOpcoes(Pessoa pessoa)
+    private static void MenuOpcoes(Cliente cliente)
     {
-        Console.WriteLine($"Como posso ajudar {pessoa.Nome}?");
+        Console.WriteLine($"Como posso ajudar {cliente.Nome}?");
 
         Console.WriteLine($"1-Depósito");
 
@@ -48,35 +52,61 @@ internal class Program
 
         string respostaUsuario = Console.ReadLine();
 
-        RespostaParaMenuOpcoes(respostaUsuario, pessoa);
+        RespostaParaMenuOpcoes(respostaUsuario, cliente);
     }
-    private static void RespostaParaMenuOpcoes(string respostaUsuario,Pessoa pessoa)
+    private static void RespostaParaMenuOpcoes(
+    string respostaUsuario, 
+    Cliente cliente)
     {
         switch (respostaUsuario)
         {
             case "1":
-                Depositar();
+                Depositar(ref cliente);
+                MenuOpcoes(cliente);
                 break;
             case "2": 
-                Saque(); 
+                Saque(ref cliente); 
+                MenuOpcoes(cliente);
                 break;
             case "3":
                 Environment.Exit(0);
                 break;
             default:
                 Console.Clear();
-                MenuOpcoes(pessoa);
+                MenuOpcoes(cliente);
                 break;
         }
     }
-
-    private static void Saque()
+    private static void Depositar(
+    ref Cliente cliente)
     {
-        Console.WriteLine("Saque");
+        Console.Clear();
+        
+        Calculo calculo = new Calculo();
+
+        Console.WriteLine("Digite o valor a ser depositado:");        
+
+        float saldoInformadoParaDeposito = float.Parse(Console.ReadLine());
+
+        cliente.Saldo = calculo.Soma(cliente.Saldo, saldoInformadoParaDeposito);
+
+        Console.WriteLine($"Saldo atual é R${cliente.Saldo}:");
     }
 
-    private static void Depositar()
+    private static void Saque(
+    ref Cliente cliente)
     {
-        Console.WriteLine("Depósito");
+        Console.Clear();
+
+        Calculo calculo = new Calculo();
+
+        Console.WriteLine("Digite o valor a ser sacado:");
+
+        float saldoInformadoParaSaque = float.Parse(Console.ReadLine());
+        
+        cliente.Saldo = calculo.Subtracao(cliente.Saldo, saldoInformadoParaSaque);
+
+        Console.WriteLine($"Saldo atual é R${cliente.Saldo}:");
     }
+
 }
