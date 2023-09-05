@@ -1,5 +1,6 @@
 ﻿using Domain.Model;
 using Application;
+using CpfCnpjLibrary;
 
 internal class Program
 {
@@ -16,24 +17,57 @@ internal class Program
     {
         var cliente = new Cliente();
 
-        Console.WriteLine("Seu número de identificação:");
-        cliente.Id = int.Parse(Console.ReadLine());
+        while (true)
+        {
+            var listaErros = new List<string>();
 
-        Console.WriteLine("Seu nome:");
-        cliente.Nome = Console.ReadLine();
+            Console.Clear();
 
-        Console.WriteLine("Seu CPF:");
-        cliente.Cpf = Console.ReadLine();
-        
-        Console.WriteLine("Seu saldo:");
-        cliente.Saldo = float.Parse(Console.ReadLine());
+            Console.WriteLine("Seu número de identificação:");
+            string identificador = Console.ReadLine();
 
-        Console.Clear();
+            if (int.TryParse(identificador, out int id))
+                cliente.Id = id;
+            else
+                listaErros.Add("Identificação inválida. Digite apenas números.");
 
-        MenuOpcoes(cliente);
-        
-        Console.ReadKey();
-        
+            Console.WriteLine("Seu nome:");
+            cliente.Nome = Console.ReadLine();
+
+            Console.WriteLine("Seu CPF:");
+            var cpf = Console.ReadLine();
+
+            if (Cpf.Validar(cpf))
+                cliente.Cpf = cpf;
+            else
+                listaErros.Add("CPF digitado não é válido");
+
+            Console.WriteLine("Seu saldo:");
+            var saldoInformado = Console.ReadLine();
+
+            if (float.TryParse(saldoInformado, out float saldo) && saldo > 0)
+                cliente.Saldo = saldo;
+            else
+                listaErros.Add("Saldo não é válido. Digite um valor numérico maior que zero.");
+
+            if (listaErros.Count == 0)
+            {
+                Console.Clear();
+                MenuOpcoes(cliente);
+                break; 
+            }
+            else
+            {
+                Console.Clear();
+                foreach (var erro in listaErros)
+                {
+                    Console.WriteLine(erro);
+                }
+                Console.WriteLine("\nPressione qualquer tecla para corrigir os erros e continuar...");
+                Console.ReadKey();
+            }
+        }
+
         return cliente;
     }
     private static void MenuOpcoes(Cliente cliente)
